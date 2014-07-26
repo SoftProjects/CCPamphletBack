@@ -98,7 +98,6 @@ public class Controller implements Resourcer {
 	}
 	@Override
 	public CircleModel getCircle(int cid) {
-		DataBase.instance(context).getCircle(cid);
-		return null;
+		return DataBase.instance(context).getCircle(cid);
 	}
 }
