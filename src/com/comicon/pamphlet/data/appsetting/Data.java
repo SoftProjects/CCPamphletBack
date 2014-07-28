@@ -10,14 +10,14 @@ import android.os.Environment;
 
 public class Data {
 	public static final String PREFERENCES_NAME = "AppData";
-	public static final String DEFAULT_DATA_URL = "http://twzc.comicon1111.org/?c=api&a=getcdb&key=2ECBBB73";
+	private static final String DEFAULT_DATA_URL = "http://twzc.comicon1111.org/?c=api&a=getcdb&key=2ECBBB73";
 //	public static final String DEFAULT_DATA_URL = "http://whitecomet.net/5066771dc042a8e4730680c5b91c7537.html";
-	public static final String DEFAULT_MAP_URL = "http://bbs.comicon1111.org/pics/cc13/map2.jpg";
-	public static final String DEFAULT_LOCALMAP_URL = "http://bbs.comicon1111.org/pics/cc12/CC12PLANO3.jpg";
-	public static final String DEFAULT_UPDATE_CODE= "-1";
+	private static final String DEFAULT_MAP_URL = "http://bbs.comicon1111.org/pics/cc13/map2.jpg";
+	private static final String DEFAULT_LOCALMAP_URL = "http://bbs.comicon1111.org/pics/cc12/CC12PLANO3.jpg";
+	private static final String DEFAULT_UPDATE_CODE= "-1";
 	
 	public static final String IMAGE_CACHE = Environment.getExternalStorageDirectory().getPath()+"/ComiCon/";
-	public static final String CHECK_URL = "http://whitecomet.net/pamphlet.html";
+	public static final String CHECK_URL = "http://whitecomet.net/CCPamphlet.php";
 
 	private String dataUrl;
 	private String mapUrl;
@@ -39,8 +39,9 @@ public class Data {
 			edit.putString("localmapUrl", jobj.getString("localmapUrl"));
 			edit.commit();
 			//TODO
-//			return new UpdateResult(jobj.getString("updateCode"), jobj.getString("appVersion"));
-			return new UpdateResult(Math.random()+"", jobj.getString("appVersion"));
+			instance = new Data(context);
+			return new UpdateResult(jobj.getString("updateCode"), jobj.getString("appVersion"));
+//			return new UpdateResult(Math.random()+"", jobj.getString("appVersion"));
 		} catch (Exception e) {}
 		instance = new Data(context);
 		return null;
