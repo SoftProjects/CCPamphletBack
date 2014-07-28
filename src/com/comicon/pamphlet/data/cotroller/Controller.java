@@ -85,7 +85,7 @@ public class Controller implements Resourcer {
 				if(result == null) return;
 				boolean isUpdate = !result.getUpdateCode().equals(Data.instance(context).getUpdateCode());
 				if(handler!=null && isUpdate)handler.sendEmptyMessage(6);
-				else if(handler!=null ) handler.sendEmptyMessage(5);
+//				else if(handler!=null ) handler.sendEmptyMessage(5);
 				//TODO check APP update
 			}
 		}.start();
