@@ -1,7 +1,11 @@
 package com.comicon.pamphlet.data.cotroller;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 
 import android.content.Context;
@@ -66,9 +70,16 @@ public class Controller implements Resourcer {
 	}
 
 	@Override
-	public void sendResponse(String s,Handler handler) {
-		// TODO Auto-generated method stub
-		Toast.makeText(context, "发送成功"+s, Toast.LENGTH_LONG).show();
+	public void sendResponse(String s,final Handler handler) {
+		HttpLinkClient client = new HttpLinkClient();
+		ArrayList<NameValuePair> para = new ArrayList<NameValuePair>();
+		para.add(new BasicNameValuePair("response",s));
+		client.asyPost(Data.instance(context).getResponseUrl(),para, new HttpHandler() {
+			@Override
+			public void onSucceed(String result) {
+				if(handler!=null) handler.sendEmptyMessage(0);
+			}
+		});
 	}
 
 	@Override

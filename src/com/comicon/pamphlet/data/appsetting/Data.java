@@ -1,6 +1,5 @@
 package com.comicon.pamphlet.data.appsetting;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
@@ -15,6 +14,7 @@ public class Data {
 	private static final String DEFAULT_MAP_URL = "http://bbs.comicon1111.org/pics/cc13/map2.jpg";
 	private static final String DEFAULT_LOCALMAP_URL = "http://bbs.comicon1111.org/pics/cc12/CC12PLANO3.jpg";
 	private static final String DEFAULT_UPDATE_CODE= "-1";
+	private static final String DEFAULT_RESPONSE_URL="http://whitecomet.net/CCPamphlet.php/Index/response";
 	
 	public static final String IMAGE_CACHE = Environment.getExternalStorageDirectory().getPath()+"/ComiCon/";
 	public static final String CHECK_URL = "http://whitecomet.net/CCPamphlet.php";
@@ -23,6 +23,8 @@ public class Data {
 	private String mapUrl;
 	private String localmapUrl;
 	private String updateCode;
+	private String responseUrl;
+	
 	private static Data instance = null;
 	private Context context;
 	public static Data instance(Context context){
@@ -37,11 +39,11 @@ public class Data {
 			edit.putString("dataUrl", jobj.getString("dataUrl"));
 			edit.putString("mapUrl", jobj.getString("mapUrl"));
 			edit.putString("localmapUrl", jobj.getString("localmapUrl"));
+			edit.putString("responseUrl", jobj.getString("responseUrl"));
 			edit.commit();
 			//TODO
 			instance = new Data(context);
 			return new UpdateResult(jobj.getString("updateCode"), jobj.getString("appVersion"));
-//			return new UpdateResult(Math.random()+"", jobj.getString("appVersion"));
 		} catch (Exception e) {}
 		instance = new Data(context);
 		return null;
@@ -62,6 +64,7 @@ public class Data {
 		mapUrl = pref.getString("mapUrl", DEFAULT_MAP_URL);
 		localmapUrl = pref.getString("localmapUrl", DEFAULT_LOCALMAP_URL);
 		updateCode = pref.getString("updateCode", DEFAULT_UPDATE_CODE);
+		responseUrl = pref.getString("responseUrl", DEFAULT_RESPONSE_URL);
 	}
 
 	public String getDataUrl() {
@@ -78,5 +81,9 @@ public class Data {
 
 	public String getUpdateCode() {
 		return updateCode;
+	}
+	
+	public String getResponseUrl() {
+		return responseUrl;
 	}
 }
