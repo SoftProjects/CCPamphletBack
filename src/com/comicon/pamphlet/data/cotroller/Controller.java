@@ -1,6 +1,9 @@
 package com.comicon.pamphlet.data.cotroller;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
@@ -31,7 +34,14 @@ public class Controller implements Resourcer {
 	}
 	@Override
 	public List<CircleModel> getAllList() {
-		return DataBase.instance(context).getAllCircles();
+		List<CircleModel> ret = DataBase.instance(context).getAllCircles();
+		Collections.sort(ret,new Comparator<CircleModel>() {
+			@Override
+			public int compare(CircleModel lhs, CircleModel rhs) {
+				return lhs.getOrder().compareTo(rhs.getOrder());
+			}
+		});
+		return ret;
 	}
 	@Override
 	public List<CircleModel> getFavouriteList() {

@@ -35,22 +35,22 @@ public class DataBase extends AbstractDataBase {
 	private final static int version = 5;
 	private final static String name = "data.db";
 	
-	private static DataBase db = null;
+	private static DataBase instance = null;
 	public static DataBase instance(Context context){
-		if(db == null && context == null) return null;
-		if(db == null) db = new DataBase(context);
-		return db;
+		if(instance == null && context == null) return null;
+		if(instance == null) instance = new DataBase(context);
+		return instance;
 	}
 	
+	private SQLiteDatabase db;
 	private DataBase(Context context) {
 		super(context, name, version);
 		setTable(tableInfos);
+		db = getWritableDatabase();
 	}
 	private SparseArray<CircleModel> circleCache = new SparseArray<CircleModel>();
 	
 	public void updateData(String json) throws JSONException{
-		SQLiteDatabase db = getWritableDatabase();
-		
 		JSONObject object = new JSONObject(json.trim().replace("&nbsp;", " "));
 
 		db.delete(workTable.TABLE_NAME, null, null);
@@ -84,12 +84,11 @@ public class DataBase extends AbstractDataBase {
 			values.put("c_order", circle.getString("order"));
 			db.insert(circleTable.TABLE_NAME, "cid", values );
 		}
-		db.close();
+		
 		initialData();
 	}
 
 	public void initialData(){
-		SQLiteDatabase db = getReadableDatabase();
 		Cursor c = db.query(circleTable.TABLE_NAME, null, null, null, null, null, null);
 		circleCache.clear();
 		while(c.moveToNext()){
@@ -106,6 +105,8 @@ public class DataBase extends AbstractDataBase {
 			c2.close();
 			circleCache.put(cid, new Circle(cid, name, mode, site, property, boothnum, c_order, isfavour));
 		}
+		c.close();
+		
 	}
 	
 	public List<CircleModel> getAllCircles(){
@@ -129,9 +130,17 @@ public class DataBase extends AbstractDataBase {
 	
 	public List<WorkModel> search(String search){
 		List<WorkModel> ret = new ArrayList<WorkModel>();
-		SQLiteDatabase db = getWritableDatabase();
 		SparseArray<CircleModel> circles = new SparseArray<CircleModel>();
 		//TODO
+		if(search==null||search.trim().equals("")) return ret;
+		Cursor cirRet = db.query(circleTable.TABLE_NAME, null, "name like ?", new String[]{"%"+search+"%"}, null, null, null);
+		List<Integer> tmp = new ArrayList<Integer>();
+		while(cirRet.moveToNext()){
+			int cid = cirRet.getInt(cirRet.getColumnIndex("cid"));
+			ret.addAll(getCircle(cid).getWorks());
+		}
+		cirRet.close();
+		
 		Cursor c = db.query(workTable.TABLE_NAME, null, "name like ?", new String[]{"%"+search+"%"}, null, null, null);
 		while(c.moveToNext()){
 			int wid = c.getInt(c.getColumnIndex("wid"));
@@ -149,7 +158,8 @@ public class DataBase extends AbstractDataBase {
 			}
 			ret.add(new Work(circle, wid, name, mode, category, theme, price, sample));
 		}
-		db.close();
+		c.close();
+		
 		return ret;
 	}
 	
@@ -158,19 +168,17 @@ public class DataBase extends AbstractDataBase {
 	}
 	
 	public void setFavourite(boolean isFavour,CircleModel cricle){
-		SQLiteDatabase db = getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put("isfavour", isFavour+"");
 		if(db.update(favorTable.TABLE_NAME, values , "cid=?", new String[]{cricle.getCid()+""})==0){
 			values.put("cid", cricle.getCid()+"");
 			db.insert(favorTable.TABLE_NAME, "cid", values);
 		}
-		db.close();
+		
 	}
 	
 	public List<WorkModel> getWorks(CircleModel circle){
 		List<WorkModel> ret = new ArrayList<WorkModel>();
-		SQLiteDatabase db = getWritableDatabase();
 		Cursor c = db.query(workTable.TABLE_NAME, null, "cid=?", new String[]{circle.getCid()+""}, null, null, null);
 		while(c.moveToNext()){
 			int wid = c.getInt(c.getColumnIndex("wid"));
@@ -182,7 +190,8 @@ public class DataBase extends AbstractDataBase {
 			String sample = c.getString(c.getColumnIndex("sample"));
 			ret.add(new Work(circle, wid, name, mode, category, theme, price, sample));
 		}
-		db.close();
+		c.close();
+		
 		return ret;
 	}
 }
